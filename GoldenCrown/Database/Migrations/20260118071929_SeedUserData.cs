@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace GoldenCrown.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class SeedUserData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -89,6 +91,15 @@ namespace GoldenCrown.Database.Migrations
                         column: x => x.sender_account_id,
                         principalTable: "accounts",
                         principalColumn: "id");
+                });
+
+            migrationBuilder.InsertData(
+                table: "users",
+                columns: new[] { "id", "Login", "name", "password" },
+                values: new object[,]
+                {
+                    { 1, "admin", "Administrator", "admin" },
+                    { 2, "user", "Regular User", "user" }
                 });
 
             migrationBuilder.CreateIndex(

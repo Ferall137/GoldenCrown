@@ -1,5 +1,6 @@
 ﻿using GoldenCrown.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Metadata;
 
 namespace GoldenCrown.Database
@@ -11,7 +12,7 @@ namespace GoldenCrown.Database
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
@@ -33,12 +34,15 @@ namespace GoldenCrown.Database
                 .HasColumnName("password")
                 .IsRequired();
 
-            var accountEntity = modelBuilder.Entity<Account>();
-            accountEntity.ToTable("accounts");
+            SeedUserData(userEntity);
+
+            var accountEntity = modelBuilder.Entity<Account>()
+                 .ToTable("accounts");
             accountEntity.HasKey(x => x.Id);
             accountEntity.Property(x => x.Id)
                 .HasColumnName("id")
-                .UseIdentityColumn();
+                .UseIdentityColumn()
+                .ValueGeneratedOnAdd();
             accountEntity.Property(x => x.UserId)
                 .HasColumnName("user_id")
                 .IsRequired();
@@ -93,6 +97,26 @@ namespace GoldenCrown.Database
                 .WithMany()
                 .HasForeignKey(x => x.ReceiverAccountId)
                 .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        private void SeedUserData(EntityTypeBuilder<User> userEntity)
+        {
+            userEntity.HasData(
+                new User
+                {
+                    Id = 1,
+                    Login = "admin",
+                    Name = "Administrator",
+                    Password = "admin"
+                },
+                new User
+                {
+                    Id = 2,
+                    Login = "user",
+                    Name = "Regular User",
+                    Password = "user"
+                }
+            );
         }
     }
 }
